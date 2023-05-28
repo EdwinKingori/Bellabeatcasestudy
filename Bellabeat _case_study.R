@@ -90,4 +90,44 @@ sleepday1 %>%
 #3: Most participants average around 7400 steps, resulting them to burn around 2300 calories a day
 #4: the average sedentary time is 991, an equivalent of 16 hours which is lower than the medically required 4-8hours a day (https://bmcpublichealth.biomedcentral.com/articles/10.1186/s12889-023-15029-8). 
 
-#Data Aggregation 
+#Data Aggregation
+#Merging Data
+merged_data <- merge (x = sleepday1, y =  activity1, by = 'id', )
+head(merged_data)
+merged_data2 <- merge(x = steps1, y =  activity1, by = 'id')
+head(merged_data2)
+
+#Visualization 
+ggplot(data  = activity1)+
+  geom_point(mapping = aes(x = total_steps, y = calories), color = 'blue')+
+  geom_smooth(mapping = aes(x = total_steps, y = calories), method = 'loess')+
+  labs(title = "Total Steps Vs Calories")
+
+ggplot(data = merged_data, aes(x = total_steps, y = calories))+
+  geom_point(color = 'darkblue')+
+  geom_smooth()+
+  labs(title = 'Steps vs Calories')
+
+#Calories burnt by steps and distance.
+
+
+ggplot(data = merged_data) +
+  geom_point(mapping = aes(x = total_steps, y = calories)) +
+  geom_text(mapping = aes(x = total_steps, y = calories, label = calories), vjust = -0.5, hjust = 0.5, size = 3) +
+  geom_point(mapping = aes(x = total_distance, y = calories), color = "red") +
+  geom_text(mapping = aes(x = total_distance, y = calories, label = calories), vjust = -0.5, hjust = 0.5, size = 3, color = "red") +
+  facet_wrap(~ sleep_day, scales = "free") +
+  labs(title = "Calories burnt by steps and distance (Faceted by sleep day)")+
+  theme(plot.margin = margin(1, 1, 1, 1, "cm"),
+        strip.text = element_text(size = 10, face = "bold"))
+
+
+
+
+
+
+
+
+
+
+  
