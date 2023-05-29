@@ -90,9 +90,18 @@ sleepday1 %>%
 #3: Most participants average around 7400 steps, resulting them to burn around 2300 calories a day
 #4: the average sedentary time is 991, an equivalent of 16 hours which is lower than the medically required 4-8hours a day (https://bmcpublichealth.biomedcentral.com/articles/10.1186/s12889-023-15029-8). 
 
+# formatting 
+sleepday1$sleep_day <- as.Date(sleepday1$sleep_day, format = "%m/%d/%Y")
+activity1$activity_date <- as.Date(activity1$activity_date, format = "%m/%d/%Y")
+head(sleepday1)
+head(activity1)
+
+
+
 #Data Aggregation
 #Merging Data
-merged_data <- merge (x = sleepday1, y =  activity1, by = 'id', )
+merged_data <- merge (x = sleepday1, y =  activity1, by = c('id', 'sleep_day'))
+merged_data <- distinct(merged_data, .keep_all = TRUE)
 head(merged_data)
 merged_data2 <- merge(x = steps1, y =  activity1, by = 'id')
 head(merged_data2)
@@ -110,20 +119,43 @@ ggplot(data = merged_data, aes(x = total_steps, y = calories))+
 
 #Calories burnt by steps and distance.
 
+# Relationship Between Calories and Total Steps by Activity Date
+ggplot(data = merged_data, aes(x=calories, y= total_steps))+
+  geom_point()+
+  geom_smooth()+
+  facet_wrap(~activity_date)+
+  labs(title = "Relationship Between Calories and Total Steps by Activity Date")+
+  theme(plot.title = element_text(hjust = 0.5))
 
-ggplot(data = merged_data) +
-  geom_point(mapping = aes(x = total_steps, y = calories)) +
-  geom_text(mapping = aes(x = total_steps, y = calories, label = calories), vjust = -0.5, hjust = 0.5, size = 3) +
-  geom_point(mapping = aes(x = total_distance, y = calories), color = "red") +
-  geom_text(mapping = aes(x = total_distance, y = calories, label = calories), vjust = -0.5, hjust = 0.5, size = 3, color = "red") +
-  facet_wrap(~ sleep_day, scales = "free") +
-  labs(title = "Calories burnt by steps and distance (Faceted by sleep day)")+
-  theme(plot.margin = margin(1, 1, 1, 1, "cm"),
-        strip.text = element_text(size = 10, face = "bold"))
+ggplot(data = merged_data, aes(x=calories, y= total_distance))+
+  geom_point()+
+  geom_smooth()+
+  facet_wrap(~activity_date)+
+  labs(title = "Relationship Between Calories and Total Distance by Activity Date")+
+  theme(plot.title = element_text(hjust = 0.5))
 
+#Exploring the relationship between steps taken in a day and sedentary minutes
 
+ggplot(data = merged_data, aes(x = total_steps, y = sedentary_minutes))+
+  geom_point()+
+  geom_smooth()+
+  labs(title = "Sedentary Minutes vs Total steps Taken")+
+  theme(plot.title = element_text(hjust = 0.5))
+# the plot shows the need for the company to sensitize its users to start  walking more
 
+#Exploring the Relationship Between Minutes Asleep and Time in Bed
+ggplot(data = sleepday1, aes(x= total_minutes_asleep, y = total_time_in_bed))+
+  geom_point()+
+  geom_smooth()+
+  labs(title = "Relationship Between Minutes Asleep and Time in Bed")+
+  theme(plot.title = element_text(hjust = 0.5))
 
+ggplot(data = merged_data, aes(x= total_minutes_asleep, y = sedentary_minutes))+
+  geom_point(color ="darkblue")+
+  geom_smooth()+
+  labs(title = "Relationship Between Minutes Asleep and Time in Bed")+
+  theme(plot.title = element_text(hjust = 0.5))
+# the plot shows that for users to improve their sleep, the company can recommend reducing sedentary time
 
 
 
