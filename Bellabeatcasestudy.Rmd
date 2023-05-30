@@ -1,0 +1,18 @@
+---
+title: "Bellabeat_case_study"
+author: "Edwin King'ori"
+date: "`r Sys.Date()`"
+output: 
+   
+  html_document: 
+    toc: yes
+    theme: readable
+---
+ <center> Mission Statement </center>
+<p style="color:#333333;">
+Bellabeat, a high-tech manufacturer of health-focused products for women, believes that analyzing smart
+device fitness data could help unlock new growth opportunities to become a larger player in the global [smart device] (https://en.wikipedia.org/wiki/Smart_device) market. The objective is to focus on one of
+Bellabeat’s products and analyze smart device data to gain insight into how consumers are using their smart devices.The insights discovered will then help guide marketing strategy for the company. </p>
+
+
+
