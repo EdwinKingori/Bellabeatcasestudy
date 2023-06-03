@@ -111,17 +111,15 @@ merged_data2 <- merge(x = steps1, y =  activity1, by = 'id')
 head(merged_data2)
 
 #Visualization 
-ggplot(data  = activity1)+
-  geom_point(mapping = aes(x = total_steps, y = calories), color = 'blue')+
-  geom_smooth(mapping = aes(x = total_steps, y = calories), method = 'loess')+
-  labs(title = "Relationship between the Total Steps taken Vs Calories burnt")+
-  theme(plot.title = element_text(hjust = 0.5))
-
-ggplot(data = merged_data, aes(x = total_steps, y = calories))+
-  geom_point(color = 'darkblue')+
+# Relationship between the Steps vs Calories
+ggplot(data = merged_data, aes(x = total_steps, y = calories, color = calories))+
+  geom_point()+
   geom_smooth()+
   labs(title = 'Relationship between the Steps vs Calories')+
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
 
 #Calories burnt by steps and distance.
 
@@ -131,14 +129,16 @@ ggplot(data = merged_data, aes(x=calories, y= total_steps))+
   geom_smooth()+
   facet_wrap(~activity_date)+
   labs(title = "Relationship Between Calories and Total Steps by Activity Date")+
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA))
 
 ggplot(data = merged_data, aes(x=calories, y= total_distance))+
   geom_point()+
   geom_smooth()+
   facet_wrap(~activity_date)+
   labs(title = "Relationship Between Calories and Total Distance by Activity Date")+
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA))
 
 #Exploring the relationship between steps taken in a day and sedentary minutes
 
@@ -146,7 +146,8 @@ ggplot(data = merged_data, aes(x = total_steps, y = sedentary_minutes))+
   geom_point(color = "blue")+
   geom_smooth()+
   labs(title = "Sedentary Minutes vs Total steps Taken")+
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA))
 # the plot shows the need for the company to sensitize its users to start  walking more
 
 #Exploring the Relationship Between Minutes Asleep and Time in Bed
@@ -154,8 +155,21 @@ ggplot(data = sleepday1, aes(x= total_minutes_asleep, y = total_time_in_bed, col
   geom_point()+
   geom_smooth()+
   labs(title = "Relationship Between Minutes Asleep and Time in Bed")+
-  theme(plot.title = element_text(hjust = 0.5))+
-  scale_color_gradient(low="red", high ="#008000")
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))+
+  scale_color_gradient(low="red", high ="#008000") 
+
+#Exploring the Relationship Between Minutes Asleep and Time in Bed (as per each sleep-day)
+ggplot(data = sleepday1, aes(x= total_minutes_asleep, y = total_time_in_bed, color = sleep_day))+
+  geom_point()+
+  geom_smooth()+
+  labs(title = " Minutes Asleep Vs Time in Bed(per each sleep_day)")+
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
 
 ggplot(data = merged_data, aes(x= total_minutes_asleep, y = sedentary_minutes))+
   geom_point(color ="darkblue")+
@@ -163,6 +177,7 @@ ggplot(data = merged_data, aes(x= total_minutes_asleep, y = sedentary_minutes))+
   labs(title = "Relationship Between Minutes Asleep and sedentary_minutes")+
   theme(plot.title = element_text(hjust = 0.5))
 # The plot shows that for users to improve their sleep, the company can recommend reducing sedentary time
+
 
 
 
