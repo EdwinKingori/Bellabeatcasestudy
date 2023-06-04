@@ -48,7 +48,7 @@ Analyzing smart device usage data in order to gain insight into how customers us
   <li>Thirty eligible Fitbit users consented to the submission of personal tracker data, including minute-level output for physical activity, heart rate, and sleep monitoring.</li>
     </ul>
       
-<strong> 2.3 Determining the credibility of data. </strong>
+<strong> 2.2 Determining the credibility of data. </strong>
  <ul style=“list-style-type:square” > 
 Is the Data ROCC?  Reliable, Original, Comprehensive, Current, and Cited.
     
@@ -68,7 +68,7 @@ Is the Data ROCC?  Reliable, Original, Comprehensive, Current, and Cited.
   </ul>
        
 
-<strong>2.1 Loading Packages </strong>
+<strong>2.3 Loading Packages </strong>
 
 ```{r}
 library(tidyverse)
@@ -80,7 +80,7 @@ library(ggplot2)
 library(selectr)
 ```
 
-<strong>2.2 Importing files</strong>
+<strong>2.4 Importing files</strong>
 
 ```{r}
 activity <- read.csv("dailyActivity_merged.csv")
@@ -99,9 +99,9 @@ head(Weight)
 
 ```
 
-<strong>2.3 Data Cleaning</strong>
+<strong>2.5 Data Cleaning</strong>
 
-2.3.1 Cleaning Column Names
+2.5.1 Cleaning Column Names
 
 ```{r}
 activity1 <- janitor::clean_names(activity)
@@ -118,7 +118,7 @@ colnames(sleepday1)
 colnames(steps1)
 
 ```
-<strong> 2.4 Summarizing data </strong>
+<strong> 2.6 Summarizing data </strong>
 
 Checking sample size to decide whether to use for analysis
 <ul style=“list-style-type:square” >
@@ -160,7 +160,7 @@ sleepday1 %>%
 
 </ul>
 
-2.5 Insights From the Summary
+<strong> 2.7 Insights From the Summary</strong> 
  <ol style = "list-style: circle"> 
  <li> From the distinct data above, 33 participants reported their data for activity, Intensities and Steps. Although only 24 participants shared their data for sleep_day, I'll still use the data set for analysis. </li>
  <li> Only 8 participants partook in the weight log analysis, which is the smallest data set. Thus, will not use it due to bias concerns </li>
@@ -170,7 +170,151 @@ sleepday1 %>%
  <li>Most adults spend an approximated 7 hours of sleep. </li>
  </ol>
  
- 
- ```{r}
- 
+# Process and Analyze
+
+<strong> 3.0 Formatting: Changing the date format, making the tables compatible for a successful merge.</strong> 
+
+```{r}
+# Formatting 'activity1' table
+activity1$activity_date <- as.POSIXct(activity1$activity_date, format = "%m/%d/%Y", tz = Sys.timezone())
+activity1$date <- format(activity1$activity_date, format = "%m/%d/%y")
+
+# Formatting 'sleepday1' table
+sleepday1$sleep_day <- as.POSIXct(sleepday1$sleep_day, format = "%m/%d/%Y %I:%M:%S %p", tz = Sys.timezone())
+sleepday1$date <- format(sleepday1$sleep_day, format = "%m/%d/%y")
+
+head(activity1)
+head(sleepday1)
 ```
+<strong> 3.1 Merging and Creating new Variables from merged data </strong>  
+
+```{r}
+merged_data <- merge ( sleepday1, activity1, by = c('id', 'date'))
+head(merged_data)
+
+merged_data2 <- merge(x = steps1, y =  activity1, by = 'id')
+head(merged_data2)
+
+# Creating two variables: User_type and sleep_quality that will exhibit the distribution of the steps and sleep day data for all users
+merged_df <- merged_data%>%
+  mutate(user_type = case_when(
+    .$total_steps < 5000 ~ "Sedentary",
+    .$total_steps >= 5000 & .$total_steps < 7499 ~ "Low_active",
+    .$total_steps >= 7500 & .$total_steps < 9999 ~ "Moderately_active",
+    .$total_steps >= 10000 & .$total_steps < 12499 ~ "Active",
+    .$total_steps >= 12500  ~ "very_active"
+  ),sleep_quality = case_when(
+    .$total_minutes_asleep/60 >= 6 & .$total_minutes_asleep/60 <= 8 ~"Sufficient Sleep",
+    .$total_minutes_asleep/60 < 6  ~ "InSufficient Sleep",
+    .$total_minutes_asleep/60 > 9  ~ "OverSleeping"
+    
+  )
+  )
+head(merged_df)
+```
+
+# Share
+<strong> 4.1 Visualizations </strong> 
+
+   4.1.1: Examining the relationship between the Steps vs Calories. 
+  
+```{r}
+  ggplot(data = merged_data, aes(x = total_steps, y = calories, color = calories))+
+  geom_point()+
+  geom_smooth()+
+  labs(title = 'Relationship between the Steps vs Calories')+
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+
+ggplot(data = merged_data, aes(x = very_active_minutes, y = calories, color = calories))+
+  geom_point()+
+  geom_smooth()+
+  labs(title = 'Relationship between the Steps vs Calories')+
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+
+```
+
+<p> Based on the plots above, there is a positive correlation between The Total_steps, Very_active_minutes and Calories. This means that the more active participants are, the more calories they burn. </P>
+
+  4.1.2 : Exploring the relationship between steps taken in a day and sedentary minutes
+```{r}
+ggplot(data = merged_data, aes(x = total_steps, y = sedentary_minutes))+
+  geom_point(color = "blue")+
+  geom_smooth()+
+  labs(title = "Sedentary Minutes vs Total steps Taken")+
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA))
+```
+
+<p> The plot reveals a negative correlation. There is a downward trend in the data points and the smooth line, which suggests a negative relationship between sedentary minutes and the total steps taken. When there is an increase in the number of steps taken, there is an automatic reduction in the amount of time spent in sedentary state. </p>
+<p> Therefore, the plot implies that participants with a high physical output in the steps taken have a lower amount of time spent in sedentary minutes. Thus, the plot shows the need for the company to sensitize its participants to engage in more physical activity like walking and reduce amount of time spent in sedentary. </P> 
+
+  4.1.3 : Exploring the Relationship Between Minutes Asleep and Time in Bed
+```{r}
+ggplot(data = sleepday1, aes(x= total_minutes_asleep, y = total_time_in_bed, color = total_minutes_asleep))+
+  geom_point()+
+  geom_smooth()+
+  labs(title = "Relationship Between Minutes Asleep and Time in Bed")+
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))+
+  scale_color_gradient(low="red", high ="#008000") 
+```
+<p> The plot indicates a positive correlation between minutes asleep and time in bed. There is a general upward trend in the data points and the smooth line and suggests a positive correlation between the duration of sleep (minutes asleep) and the total time spent in bed. This means that individuals who tend to sleep for longer durations also spend more time in bed. </p>
+<p> Color Variation: The color gradient applied to the data points represents the "Total Minutes Asleep" variable. The color variation from red to green indicates the range of values for total minutes asleep, with red indicating lower values and green indicating higher values. This color gradient provides an additional dimension of information to the plot. </p>
+<p> Concentration of Points: If you notice a concentration of data points around a specific range of minutes asleep and time in bed, it suggests that there may be a common pattern or trend within that range. For example, if you observe a cluster of green points with a high time in bed and high minutes asleep, it could indicate that individuals who consistently sleep for longer duration also spend more time in bed.</p>
+
+4.1.4 : Exploring the Relationship Between Minutes Asleep and Time in Bed (as per each sleep-day)
+
+```{r}
+ggplot(data = sleepday1, aes(x= total_minutes_asleep, y = total_time_in_bed, color = sleep_day))+
+  geom_point()+
+  geom_smooth()+
+  labs(title = " Minutes Asleep Vs Time in Bed(per each sleep_day)")+
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+```
+<p> The general distribution of data points and the smooth line provides insights in the correlation between the minutes asleep and time in bed. if the data points cluster closely around the smooth line, it indicates a strong relationship. Thus, the plot indicates a strong positive relationship between the minutes spent during the participants sleep time and their time in bed. </p>
+<p> However, the plot also exhibits significant fluctuations and outliers. the fluctuations indicate changes in sleep duration or time in bed for specific sleep days. The Outliers, represented by data points that deviate significantly from the general trend, might suggest unique sleep patterns or abnormal sleep behaviors for certain days. </p> 
+<p> For this reason, there is need to check the correlation and effects of the fluctuations and outliers. In this case, we can explore the relationship  time spent asleep and its impact on sedentary time spent. </P>
+
+  4.1.5 : Exploring the Correlation Between Minutes Asleep and sedentary_minutes
+```{r}
+ggplot(data = merged_data, aes(x= total_minutes_asleep, y = sedentary_minutes))+
+  geom_point(color ="darkblue")+
+  geom_smooth()+
+  labs(title = "Relationship Between Minutes Asleep and sedentary_minutes")+
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA))
+```
+
+<p> The plot confirms a negative relationship between the minutes spent asleep and the amount of sedentary time spent. the fluctuations and outliers in plot 4.1.4 indicate that as the number of minutes spent asleep increases, the number of sedentary minutes tends to decrease. This suggests that individuals who sleep longer may engage in fewer sedentary activities. <?p>
+<p> There is a rigid/tight cluster of data points around the smoothline compared to the few  data points being scattered indicating a convincing negative relationship between the minutes spent asleep and the amount of sedentary time spent.</p>
+<p> Recommendation : In this case, for users to improve their sleep, the company can recommend reducing sedentary time </p>
+
+# ACT
+
+<strong> Conclusion </strong>
+<p> The data provided by Fitbit user activity indicates that most participants consistently provided data for the steps, intensity, sleep and calories activities while only few participants tracked weight and heart rate activities. </p>
+<p> The data collected has its own limitations, such as being an outdated data set collected in 2016, which does not represent the prevailing consumer behavior. Additionally, the lack of demographic data limits our ability to make conclusive decisions on specific user groups. For this reason, research data provided in the future should contain more recent data and should include demographic information such as device type, location etc, which will provide a comprehensive understanding of consumer behavior. </p>
+
+5.1 Recommendations  
+
+<p> For the Bellabeat's success in becoming a global smart device user, the analysis conducted recomends the following business decisions: </p>
+<ol style=“list-style-type:square” >
+<li> sleep journal </li>
+<li> </li>
+<li> </li>
+<li> </li>
+</ol>
+  
+
+

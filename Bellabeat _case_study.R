@@ -102,8 +102,7 @@ sleepday1$date <- format(sleepday1$sleep_day, format = "%m/%d/%y")
 head(activity1)
 head(sleepday1)
 
-#Data Aggregation
-#Merging Data
+#Merging Datasets
 merged_data <- merge ( sleepday1, activity1, by = c('id', 'date'))
 #merged_data <- distinct(merged_data, .keep_all = TRUE)
 head(merged_data)
@@ -178,10 +177,64 @@ ggplot(data = merged_data, aes(x= total_minutes_asleep, y = sedentary_minutes))+
   theme(plot.title = element_text(hjust = 0.5))
 # The plot shows that for users to improve their sleep, the company can recommend reducing sedentary time
 
+# Creating two variables: User_type and sleep_quality that will exhibit the distribution of the steps and sleep day data for all users
+merged_df <- merged_data%>%
+  mutate(user_type = case_when(
+    .$total_steps < 5000 ~ "Sedentary",
+    .$total_steps >= 5000 & .$total_steps < 7499 ~ "Low_active",
+    .$total_steps >= 7500 & .$total_steps < 9999 ~ "Moderately_active",
+    .$total_steps >= 10000 & .$total_steps < 12499 ~ "Active",
+    .$total_steps >= 12500  ~ "very_active"
+  ),sleep_quality = case_when(
+    .$total_minutes_asleep/60 >= 6 & .$total_minutes_asleep/60 <= 8 ~"Sufficient Sleep",
+    .$total_minutes_asleep/60 < 6  ~ "InSufficient Sleep",
+    .$total_minutes_asleep/60 > 9  ~ "OverSleeping"
+    
+  )
+  )
+# User_type Distribution Plot
+ggplot(data = merged_df, aes( x = user_type, fill = user_type))+
+  geom_bar()+
+  labs(title = "User_type Distribution")+
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black',  fill = NA),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+
+merged_intensity <- merged_data%>%
+  mutate(Intensityminutes = case_when(
+    sedentary_minutes > 0~1,
+    very_active_minutes > 0 ~2,
+    fairly_active_minutes > 0 ~3,
+    lightly_active_minutes > 0 ~4,
+    
+    TRUE ~ NA_integer_
+  ))
+head(merged_intensity)
+
+ggplot(data = merged_intensity, aes(x = sedentary_minutes, y = calories)) +
+  geom_point() +
+  geom_smooth() +
+  labs(title = "Intensity and Calories") +
+  facet_wrap(~ Intensityminutes, scales = "free") +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.border = element_rect(color = 'black', fill = NA),
+        legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+
+merged_data <- merged_data %>%
+  mutate(Intensityminutes = lightly_active_minutes + very_active_minutes + fairly_active_minutes)
+
+dailyIntensitiesCalories_vizPointFacet <- merged_data %>%
+  ggplot(mapping = aes(x = Intensityminutes, y = calories)) +
+  geom_point(mapping = aes(color = Intensityminutes), show.legend = FALSE) +
+  geom_smooth(mapping = aes(linetype = Intensityminutes), show.legend = FALSE) +
+  facet_wrap(~ Intensityminutes, scales = "free")
+
+dailyIntensitiesCalories_vizPointFacet
 
 
-
-
+  
 
 
   
