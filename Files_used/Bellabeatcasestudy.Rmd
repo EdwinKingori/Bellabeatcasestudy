@@ -310,11 +310,13 @@ ggplot(data = merged_data, aes(x= total_minutes_asleep, y = sedentary_minutes))+
 
 <p> For the Bellabeat's success in becoming a global smart device user, the analysis conducted recomends the following business decisions: </p>
 <ol style=“list-style-type:square” >
-<li> sleep journal </li>
-<li> </li>
-<li> </li>
-<li> </li>
+<li> The company has the opportunity to enhance its application by integrating a personalized sleep journal feature. This addition would enable users to effectively monitor their sleep patterns and make meaningful adjustments to improve their overall rest quality. By incorporating a sleep journal, users can proactively address sedentary behaviors and prevent excessive sleep, thereby promoting healthier sleep habits. This measure serves as a strategic approach to encourage a balanced and optimized rest routine. </li>
+<li> Based on the available data, it is evident that the most engaging activities predominantly take place during the time period of 5pm to 7pm. To further enhance user engagement and promote an active lifestyle, Bellabeat's application can incorporate daily reminders for users to participate in a diverse range of physical exercises, including activities such as running. This proactive approach will not only contribute to an increase in calorie expenditure but also aid in reducing sedentary behavior.</li>
+<li> In addition to incorporating exercise reminders and integrating a sleep journal into the application, it is imperative for the company to prioritize the provision of healthy habits and a comprehensive diet program. This diet program will play a crucial role in regulating daily calorie intake by offering tailored low-calorie meal plans to individual users.</li>
+<li> Finally, Bellabeat should consider providing a periodic report on a user's performance on a specified time period. Users can benefit from receiving comprehensive weekly performance reports, which serve as valuable tools for motivation and self-improvement. These reports provide users with a holistic overview of their activities and progress over the course of a week. By reviewing these reports, users can gain insights into their achievements, identify areas for improvement, and set goals for the upcoming week. This feature empowers users to stay motivated and actively track their progress, fostering a sense of accountability and continual growth towards their health and wellness goals. </li>
 </ol>
+
+<p> Thank you for reading! This is my first case study and will sincerely appreciate your insights and constructive feedback. While this marks my inaugural case study, I am eager to not only improve my skills in data analysis but also project presentation. I am open to any criticisms and corrections you may provide. Thank you once again! </p>
   
 
 
